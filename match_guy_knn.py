@@ -73,7 +73,7 @@ def classify_person():
         print("YOU MAY LIKE THE GUY VERY MUCH")
 
 
-print(test_classify())
+print("The corret rate is", test_classify())
 classify_person()
 
 a, b = file2mat()
