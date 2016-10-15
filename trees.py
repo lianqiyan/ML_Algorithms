@@ -54,4 +54,3 @@ labels = ['no surface', 'flippers']
 
 print(cal_entropy(dataset))
 print(spilt_data(dataset, 0, 1))
-print(choosebestf(dataset))
