@@ -1,5 +1,5 @@
 import math
-
+import operator
 
 def cal_entropy(data):
     num = len(data)
@@ -30,20 +30,49 @@ def choosebestf(data):
     num = len(data[0])
     entropy = cal_entropy(data)
     bestinfogain = 0.0
-    bestF = 0.0
+    bestF = -1
     for i in range(num):
         flist = [example[i] for example in data]
         uniqueval = set(flist)
         newentropy = 0.0
         for value in uniqueval:
-            subdataset = spilt_data(data, i, value)
+            subdataset = spilt_data(data, i, value) # generate new sub dataset
             prob = len(subdataset)/float(len(data))
             newentropy += prob * cal_entropy(subdataset)
-        infogain = entropy - newentropy
-        if infogain > bestinfogain:
+        infogain = entropy - newentropy  # information gain
+        if infogain > bestinfogain:  # get the best feature by compare
             bestinfogain = infogain
             bestF = i
     return bestF
+
+
+def majorityCnt(classlist):
+    classcount = {}
+    for v in classlist:
+        if v not in classcount.keys(): classcount[v] = 0
+        classcount[v] += 1
+    sortedClassCount = sorted(classcount.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
+
+
+def createtree(data, label):
+    classlist = [example[-1] for example in data]
+    if classlist.count(classlist[0]) == len(classlist):
+        return classlist[0]   # if the rest of sample are in the same class, then stop classify
+    if len(data[0]) == 1:   # if end iterating all feature, then return the most one
+        return majorityCnt(classlist)
+    bfeature = choosebestf(data)
+    blabel = label[bfeature]
+    mytree = {blabel: {}}
+    del(label[bfeature])
+    fvalue = [example[bfeature] for example in dataset]
+    uniquevals = set(fvalue)
+    for value in uniquevals:
+        sublabels = labels[:]
+        mytree[blabel][value] = createtree(spilt_data(data, bfeature, value), sublabels)
+        print(spilt_data(data, bfeature, value))
+    return mytree
+
 
 dataset = [[1, 1, 'yes'],
            [1, 1, 'yes'],
@@ -54,3 +83,5 @@ labels = ['no surface', 'flippers']
 
 print(cal_entropy(dataset))
 print(spilt_data(dataset, 0, 1))
+print(choosebestf(dataset))
+print(createtree(dataset, labels))
