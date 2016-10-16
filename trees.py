@@ -1,5 +1,7 @@
 import math
 import operator
+import matplotlib.pyplot as plt
+
 
 def cal_entropy(data):
     num = len(data)
@@ -27,7 +29,7 @@ def spilt_data(data, axis, value):
 
 
 def choosebestf(data):
-    num = len(data[0])
+    num = len(data[0]) - 1
     entropy = cal_entropy(data)
     bestinfogain = 0.0
     bestF = -1
@@ -63,6 +65,7 @@ def createtree(data, label):
         return majorityCnt(classlist)
     bfeature = choosebestf(data)
     blabel = label[bfeature]
+    print('BEST:', bfeature, blabel)
     mytree = {blabel: {}}
     del(label[bfeature])
     fvalue = [example[bfeature] for example in dataset]
@@ -74,14 +77,31 @@ def createtree(data, label):
     return mytree
 
 
+def classify(inputTree, featlabels, testvec):
+    print(inputTree.keys())
+    firststr = inputTree.keys()
+    secondDict = inputTree[firststr]
+    featIndex = featlabels.index(firststr) # get index
+    for key in secondDict.keys():
+        if testvec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classlabel = classify(secondDict[key], featlabels, testvec)
+            else:  classlabel = secondDict[key]
+    return classlabel
+
+
 dataset = [[1, 1, 'yes'],
            [1, 1, 'yes'],
            [1, 0, 'no'],
            [0, 1, 'no'],
            [0, 1, 'no']]
-labels = ['no surface', 'flippers']
+labels = ['no surfacing', 'flippers']
 
 print(cal_entropy(dataset))
+print(cal_entropy(spilt_data(dataset, 0, 1)))
 print(spilt_data(dataset, 0, 1))
 print(choosebestf(dataset))
-print(createtree(dataset, labels))
+# print(createtree(dataset, labels))
+tree = createtree(dataset, labels)
+print(tree)
+print(classify(tree, labels, [1, 1]))
