@@ -78,17 +78,16 @@ def createtree(data, label):
 
 
 def classify(inputTree, featlabels, testvec):
-    print(inputTree.keys())
-    firststr = inputTree.keys()
-    secondDict = inputTree[firststr]
-    featIndex = featlabels.index(firststr) # get index
+    print(featlabels)
+    firststr = list(inputTree.keys())
+    secondDict = inputTree[firststr[0]]
+    featIndex = featlabels.index(firststr[0])  # get index
     for key in secondDict.keys():
         if testvec[featIndex] == key:
             if type(secondDict[key]).__name__ == 'dict':
                 classlabel = classify(secondDict[key], featlabels, testvec)
             else:  classlabel = secondDict[key]
     return classlabel
-
 
 dataset = [[1, 1, 'yes'],
            [1, 1, 'yes'],
