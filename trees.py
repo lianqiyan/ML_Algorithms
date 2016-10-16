@@ -81,12 +81,13 @@ def classify(inputTree, featlabels, testvec):
     print(featlabels)
     firststr = list(inputTree.keys())
     secondDict = inputTree[firststr[0]]
-    featIndex = featlabels.index(firststr[0])  # get index
+    featIndex = 0 # get index
     for key in secondDict.keys():
         if testvec[featIndex] == key:
             if type(secondDict[key]).__name__ == 'dict':
                 classlabel = classify(secondDict[key], featlabels, testvec)
             else:  classlabel = secondDict[key]
+        featIndex += 1
     return classlabel
 
 dataset = [[1, 1, 'yes'],
