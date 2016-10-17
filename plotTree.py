@@ -6,6 +6,7 @@ def plottext(cntrPt, parentPt, txtString):
     yMid  = (parentPt[1] + cntrPt[1])/2.0 + cntrPt[1]
     createPlot.ax1.text(xMid, yMid, txtString)
 
+    
 def plotree(tree, parentPt, nodetxt):
     numleafs = getnumleaf(tree)
     treedepth = getdepth(tree)
@@ -40,9 +41,6 @@ def createPlot():
     plotree.totalD = float(getdepth(mytree))
     plotree.xOff = -0.5/plotree.totalW; plotree.yOff = 1.0
     plotree(mytree, (0.5, 1.0), '')
-    # createPlot.ax1 = plt.subplot(111, frameon=False)
-    # plotNode(U'decision node', (0.5, 0.1), (0.1, 0.5), decision)
-    # plotNode(U'leaf node', (0.8, 0.1), (0.3, 0.8), leafNode)
     plt.show()
 
 
