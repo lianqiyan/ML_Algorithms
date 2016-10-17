@@ -90,6 +90,19 @@ def classify(inputTree, featlabels, testvec):
         featIndex += 1
     return classlabel
 
+
+def storetree(trees, filename):
+    import pickle
+    with open(filename, 'wb') as handle:
+        pickle.dump(trees, handle)
+
+
+def grabtree(filename):
+    import pickle
+    with open(filename, 'rb') as handle:
+        trees = pickle.loads(handle.read())
+    return trees
+
 dataset = [[1, 1, 'yes'],
            [1, 1, 'yes'],
            [1, 0, 'no'],
