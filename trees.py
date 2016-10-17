@@ -1,6 +1,5 @@
 import math
 import operator
-import matplotlib.pyplot as plt
 
 
 def cal_entropy(data):
@@ -116,7 +115,7 @@ print(spilt_data(dataset, 0, 1))
 print(choosebestf(dataset))
 tree = createtree(dataset, labels)
 print(tree)
-storetree(tree, 'mytreeNO1.txt')
+storetree(tree, 'mytreeNO1.txt')  #store well constructed tree in hard drive for being used in the future
 mytree = grabtree('mytreeNO1.txt')
 print(mytree)
 print(classify(tree, labels, [1, 1]))
