@@ -67,7 +67,7 @@ def createtree(data, label):
     print('BEST:', bfeature, blabel)
     mytree = {blabel: {}}
     del(label[bfeature])
-    fvalue = [example[bfeature] for example in dataset]
+    fvalue = [example[bfeature] for example in data]
     uniquevals = set(fvalue)
     for value in uniquevals:
         sublabels = labels[:]
@@ -120,3 +120,10 @@ mytree = grabtree('mytreeNO1.txt')
 print(mytree)
 print(classify(tree, labels, [1, 1]))
 print(classify(tree, labels, [0, 0]))
+
+t = open('lenses.txt')
+lens = [w.strip().split('\t') for w in t.readlines()]
+t.close()
+labels = ['age', 'prescript', 'astigmatic', 'tearRate']
+print(lens)
+print(createtree(lens, labels))
