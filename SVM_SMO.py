@@ -13,7 +13,7 @@ def load_data(filename):
 
 def select_rand(i, m):
     j = i
-    while( j==i ):
+    while j == i:
         j = int(np.random.uniform(0, m))
     return j
 
@@ -28,44 +28,50 @@ def clipalpaha(aj, h, l):
 
 def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
     dataMatrix = np.mat(dataMatIn); labelMat = np.mat(classLabels).transpose()
-    b = 0; m,n = np.shape(dataMatrix)
+    b = 0; m, n = np.shape(dataMatrix)
     alphas = np.mat(np.zeros((m,1)))
     iter = 0
-    while (iter < maxIter):
+    while iter < maxIter:
         alphaPairsChanged = 0
         for i in range(m):
-            fXi = float(np.multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
-            Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
+            fXi = float(np.multiply(alphas, labelMat).T*(dataMatrix*dataMatrix[i, :].T)) + b  # predict class of i
+            Ei = fXi - float(labelMat[i])  # if checks if an example violates KKT conditions
             if ((labelMat[i]*Ei < -toler) and (alphas[i] < C)) or ((labelMat[i]*Ei > toler) and (alphas[i] > 0)):
-                j = select_rand(i,m)
-                fXj = float(np.multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[j,:].T)) + b
-                Ej = fXj - float(labelMat[j])
-                alphaIold = alphas[i].copy(); alphaJold = alphas[j].copy();
-                if (labelMat[i] != labelMat[j]):
+                # if the error is big enough then we optimize the corresponding  alpha
+                j = select_rand(i, m)
+                fXj = float(np.multiply(alphas, labelMat).T*(dataMatrix*dataMatrix[j, :].T)) + b   # predict class of j
+                Ej = fXj - float(labelMat[j])  # error
+                alphaIold = alphas[i].copy(); alphaJold = alphas[j].copy()
+                if labelMat[i] != labelMat[j]:
                     L = max(0, alphas[j] - alphas[i])
                     H = min(C, C + alphas[j] - alphas[i])
                 else:
                     L = max(0, alphas[j] + alphas[i] - C)
                     H = min(C, alphas[j] + alphas[i])
-                if L==H: print ("L==H"); continue
-                eta = 2.0 * dataMatrix[i,:]*dataMatrix[j,:].T - dataMatrix[i,:]*dataMatrix[i,:].T - dataMatrix[j,:]*dataMatrix[j,:].T
-                if eta >= 0: print ("eta>=0"); continue
+                if L == H: print("L==H"); continue  # Eta : the best amount to optimize
+                eta = 2.0 * dataMatrix[i, :]*dataMatrix[j, :].T - dataMatrix[i, :]*dataMatrix[i, :].T - dataMatrix[j, :]*dataMatrix[j, :].T
+                if eta >= 0: print("eta>=0"); continue
                 alphas[j] -= labelMat[j]*(Ei - Ej)/eta
-                alphas[j] = clipalpaha(alphas[j],H,L)
-                if (abs(alphas[j] - alphaJold) < 0.00001): print ("j not moving enough"); continue
-                alphas[i] += labelMat[j]*labelMat[i]*(alphaJold - alphas[j])#update i by the same amount as j
-                                                                        #the update is in the oppostie direction
-                b1 = b - Ei- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[i,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[i,:]*dataMatrix[j,:].T
-                b2 = b - Ej- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[j,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[j,:]*dataMatrix[j,:].T
+                alphas[j] = clipalpaha(alphas[j], H, L)  # adjust alpha between 0 and C
+                if abs(alphas[j] - alphaJold) < 0.00001: print("j not moving enough"); continue
+                alphas[i] += labelMat[j]*labelMat[i]*(alphaJold - alphas[j])  # update i by the same amount as j, in the oppostie direction
+                b1 = b - Ei- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i, :]*dataMatrix[i, :].T - \
+                     labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[i, :]*dataMatrix[j,:].T
+                b2 = b - Ej- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i, :]*dataMatrix[j, :].T - \
+                     labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[j, :]*dataMatrix[j, :].T
                 if (0 < alphas[i]) and (C > alphas[i]): b = b1
                 elif (0 < alphas[j]) and (C > alphas[j]): b = b2
                 else: b = (b1 + b2)/2.0
                 alphaPairsChanged += 1
                 print ("iter:" + str(iter) + ' '+ str(i) + 'pairs changed ' + str(alphaPairsChanged))
-        if (alphaPairsChanged == 0): iter += 1
-        else: iter = 0
-        print ("iteration number: " + str(iter))
+        if alphaPairsChanged == 0: iter += 1
+        else: iter = 0  # do the loop until alpha can't be optimized
+        print("Iteration number: " + str(iter))
     return b, alphas
 
 data, labels = load_data('testSet.txt')
-print(labels)
+# print(labels)
+# print(data)
+b, alpha = smoSimple(data, labels, 0.6, 0.001, 40)
+print(b)
+print(alpha[alpha > 0])
