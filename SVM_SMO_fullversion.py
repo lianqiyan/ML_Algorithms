@@ -2,8 +2,8 @@ import numpy as np
 
 
 class optStruct:
-    def __init__(self, datain, classlablel, C, toler):
-        self.labelmat = classlabels
+    def __init__(self, datain, classlabel, C, toler):
+        self.labelmat = classlabel
         self.X = datain
         self.C = C
         self.tol = toler
@@ -48,11 +48,11 @@ def clipAlpha(aj, h, l):
 
 def inner(i, oS):
     Ei = calcek(oS, i)
-    if ((oS.labesmat[i] < -oS.tol) and (oS.alphas[i] < oS.C)) or ((oS.labelmat[i]*Ei > oS.tol) and (oS.alphas[i] > 0)):
+    if ((oS.labesmat[i] <= oS.tol) and (oS.alphas[i] < oS.C)) or ((oS.labelmat[i]*Ei > oS.tol) and (oS.alphas[i] > 0)):
         j, Ej = selectJ(i, oS, Ei)
         alphaiOLD = oS.alphas[i].copy(); alphajOLD = oS.alphas[j].copy()
         if oS.labelmat[i] != oS.alphas[i]:
-            L = max(0, oS.alphas[j] - oS.alphas[i]):
+            L = max(0, oS.alphas[j] - oS.alphas[i])
             H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])
         else:
             L = max(0, oS.alphas[j] + oS.alphas[i] - oS.C)
@@ -65,9 +65,9 @@ def inner(i, oS):
         oS.alphas[j] -= oS.alphals[j] * (Ei -Ej)/eta
         oS.alphas[j] = clipAlpha(oS.alphas[j], H, L)
         updateEk(oS, i)
-        b1 = oS.b - Ei - oS.labelMat[i]*(oS.alphas[i]- alphaiOLD)*oS.X[i, :]*oS.X[i, :].T - \
+        b1 = oS.b - Ei - oS.labelMat[i]*(oS.alphas[i] - alphaiOLD)*oS.X[i, :]*oS.X[i, :].T - \
         oS.labelsmat[j]*(oS.X[j] - alphajOLD)*oS.X[i, :]*oS.X[j, :].T
-        b2 = oS.b - Ej - oS.labelMat[i]*(oS.alphas[i]- alphaiOLD)*oS.X[i, :]*oS.X[j, :].T - \
+        b2 = oS.b - Ej - oS.labelMat[i]*(oS.alphas[i] - alphaiOLD)*oS.X[i, :]*oS.X[j, :].T - \
         oS.labelsmat[j]*(oS.X[j] - alphajOLD)*oS.X[j, :]*oS.X[j, :].T
         if (0 < oS.alphas[i]) and (oS.C > oS.alphas[i]):
             oS.b = b1
@@ -80,7 +80,7 @@ def inner(i, oS):
 
 
 def smoPK(dataMatIn, classLabels, C, toler, maxIter):  # full Platt SMO
-    oS = optStruct(mat(dataMatIn), mat(classLabels).transpose(), C, toler)
+    oS = optStruct(np.mat(dataMatIn), np.mat(classLabels).transpose(), C, toler)
     iter = 0
     entireSet = True;
     alphaPairsChanged = 0
@@ -88,18 +88,19 @@ def smoPK(dataMatIn, classLabels, C, toler, maxIter):  # full Platt SMO
         alphaPairsChanged = 0
         if entireSet:  # go over all
             for i in range(oS.m):
-                alphaPairsChanged += innerL(i, oS)
+                alphaPairsChanged += inner(i, oS)
                 print("fullSet, iter: %d i:%d, pairs changed %d", iter, i, alphaPairsChanged)
             iter += 1
         else:  # go over non-bound (railed) alphas
-            nonBoundIs = nonzero((oS.alphas.A > 0) * (oS.alphas.A < C))[0]
+            nonBoundIs = np.nonzero((oS.alphas.A > 0) * (oS.alphas.A < C))[0]
             for i in nonBoundIs:
-                alphaPairsChanged += innerL(i, oS)
+                alphaPairsChanged += inner(i, oS)
                 print("non-bound, iter: %d i:%d, pairs changed %d", iter, i, alphaPairsChanged)
             iter += 1
         if entireSet:
             entireSet = False  # toggle entire set loop
-        elif (alphaPairsChanged == 0):
+        elif alphaPairsChanged == 0:
             entireSet = True
         print("iteration number: %d" % iter)
     return oS.b, oS.alphas
+
