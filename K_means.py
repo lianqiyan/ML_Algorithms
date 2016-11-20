@@ -22,7 +22,7 @@ def splitdata(mat):
 
 
 def distance(a, b):
-    return np.sqrt(sum(np.power(a-b, 2)))
+    return np.sqrt(np.sum(np.power(a - b, 2), 1))
 
 
 def extract_data(data):
@@ -48,7 +48,7 @@ def k_means(data, k):
     # center = data[index, 0:-1]
     center = generate_center(data[:, 0:-1], k)
     changed = True
-    while changed==True:
+    while changed:
         for i in range(0, np.shape(data)[0]):
             dis = distance(center, data[i, 0:-1])
             index = np.argsort(dis)
@@ -60,7 +60,7 @@ def k_means(data, k):
         print(center)
         print(new_center)
         print(abs(new_center - center).sum())
-        if abs(new_center - center).sum() < 0.2:
+        if abs(new_center - center).sum() < 0.001:
             changed = False
         else:
             changed = True
